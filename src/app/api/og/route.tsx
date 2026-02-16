@@ -5,6 +5,114 @@ import path from "path";
 
 export const runtime = "nodejs";
 
+const estimateTextWidth = (text: string, fontSize: number) => {
+  let units = 0;
+
+  for (const ch of text) {
+    if (ch === " ") {
+      units += 0.33;
+      continue;
+    }
+
+    if (/[.,:;!|]/.test(ch)) {
+      units += 0.25;
+      continue;
+    }
+
+    if (/[ilIjtfr]/.test(ch)) {
+      units += 0.31;
+      continue;
+    }
+
+    if (/[mwMW@#%&QGO]/.test(ch)) {
+      units += 0.78;
+      continue;
+    }
+
+    if (/[A-Z]/.test(ch)) {
+      units += 0.66;
+      continue;
+    }
+
+    if (/[0-9]/.test(ch)) {
+      units += 0.58;
+      continue;
+    }
+
+    units += 0.56;
+  }
+
+  // Slightly reduce estimate because title uses negative letter spacing.
+  return units * fontSize * 0.95;
+};
+
+const truncateTitleToTwoLines = (
+  rawTitle: string,
+  fontSize: number,
+  maxWidthPx: number,
+) => {
+  const title = rawTitle.replace(/\s+/g, " ").trim();
+  if (!title) return ["", ""];
+
+  const lines: string[] = [];
+  let remaining = title;
+
+  for (let lineIndex = 0; lineIndex < 2; lineIndex += 1) {
+    if (!remaining) break;
+
+    const isLastLine = lineIndex === 1;
+
+    if (estimateTextWidth(remaining, fontSize) <= maxWidthPx) {
+      lines.push(remaining);
+      remaining = "";
+      break;
+    }
+
+    // Find the maximum prefix that fits the available width.
+    let end = remaining.length;
+    while (end > 0 && estimateTextWidth(remaining.slice(0, end), fontSize) > maxWidthPx) {
+      end -= 1;
+    }
+
+    if (end <= 0) {
+      lines.push(isLastLine ? "..." : "");
+      remaining = "";
+      break;
+    }
+
+    if (!isLastLine) {
+      const slice = remaining.slice(0, end);
+      const lastSpace = slice.lastIndexOf(" ");
+      const cutAt = lastSpace > 0 ? lastSpace : end;
+
+      const firstLine = remaining.slice(0, cutAt).trimEnd();
+      lines.push(firstLine);
+      remaining = remaining.slice(cutAt).trimStart();
+      continue;
+    }
+
+    // Last line: reserve room for ellipsis.
+    const ellipsis = "...";
+    let lastLine = remaining.slice(0, end).trimEnd();
+
+    while (
+      lastLine.length > 0
+      && estimateTextWidth(`${lastLine}${ellipsis}`, fontSize) > maxWidthPx
+    ) {
+      lastLine = lastLine.slice(0, -1).trimEnd();
+    }
+
+    lines.push(lastLine ? `${lastLine}${ellipsis}` : ellipsis);
+    remaining = "";
+  }
+
+  if (lines.length === 1) {
+    lines.push("");
+  }
+
+  return lines.slice(0, 2);
+};
+
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
 
@@ -21,6 +129,7 @@ export async function GET(req: NextRequest) {
     .split(",")
     .map((t) => t.trim())
     .filter(Boolean);
+  const titleLines = truncateTitleToTwoLines(title, 108, 1600);
 
   // Load Geist fonts
   const geistBold = await fetch(
@@ -120,17 +229,14 @@ export async function GET(req: NextRequest) {
               letterSpacing: "-0.05em",
               lineHeight: 1.1,
               maxWidth: 1600,
-              maxHeight: 108 * 1.1 * 2, // Strict height for 2 lines
-              overflow: "hidden",
               display: "flex",
               flexDirection: "column",
-              // @ts-ignore
-              "line-clamp": 2,
-              // @ts-ignore
-              lineClamp: 2,
+              maxHeight: 108 * 1.1 * 2,
+              overflow: "hidden",
             }}
           >
-            {title}
+            <span style={{ display: "flex" }}>{titleLines[0]}</span>
+            <span style={{ display: "flex" }}>{titleLines[1]}</span>
           </div>
 
           {/* Tags */}
