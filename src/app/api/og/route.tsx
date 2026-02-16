@@ -10,40 +10,40 @@ const estimateTextWidth = (text: string, fontSize: number) => {
 
   for (const ch of text) {
     if (ch === " ") {
-      units += 0.33;
+      units += 0.35;
       continue;
     }
 
     if (/[.,:;!|]/.test(ch)) {
-      units += 0.25;
+      units += 0.28;
       continue;
     }
 
     if (/[ilIjtfr]/.test(ch)) {
-      units += 0.31;
+      units += 0.33;
       continue;
     }
 
     if (/[mwMW@#%&QGO]/.test(ch)) {
-      units += 0.78;
+      units += 0.85;
       continue;
     }
 
     if (/[A-Z]/.test(ch)) {
-      units += 0.66;
+      units += 0.75;
       continue;
     }
 
     if (/[0-9]/.test(ch)) {
-      units += 0.58;
+      units += 0.62;
       continue;
     }
 
-    units += 0.56;
+    units += 0.65;
   }
 
-  // Slightly reduce estimate because title uses negative letter spacing.
-  return units * fontSize * 0.95;
+  // Slightly increase estimate to be safer.
+  return units * fontSize * 1.1;
 };
 
 const truncateTitleToTwoLines = (
@@ -62,13 +62,14 @@ const truncateTitleToTwoLines = (
 
     const isLastLine = lineIndex === 1;
 
+    // If it fits entirely in the remaining space of the line
     if (estimateTextWidth(remaining, fontSize) <= maxWidthPx) {
       lines.push(remaining);
       remaining = "";
       break;
     }
 
-    // Find the maximum prefix that fits the available width.
+    // Find the maximum prefix that fits.
     let end = remaining.length;
     while (end > 0 && estimateTextWidth(remaining.slice(0, end), fontSize) > maxWidthPx) {
       end -= 1;
@@ -83,34 +84,30 @@ const truncateTitleToTwoLines = (
     if (!isLastLine) {
       const slice = remaining.slice(0, end);
       const lastSpace = slice.lastIndexOf(" ");
+      // Try to break at a space. If no space, just break at the width limit.
       const cutAt = lastSpace > 0 ? lastSpace : end;
 
-      const firstLine = remaining.slice(0, cutAt).trimEnd();
-      lines.push(firstLine);
+      lines.push(remaining.slice(0, cutAt).trimEnd());
       remaining = remaining.slice(cutAt).trimStart();
-      continue;
+    } else {
+      // Last line: append ellipsis.
+      let lastLine = remaining.slice(0, end).trimEnd();
+      const ellipsis = "...";
+      
+      // Backtrack until text + ellipsis fits
+      while (
+        lastLine.length > 0 && 
+        estimateTextWidth(`${lastLine}${ellipsis}`, fontSize) > maxWidthPx
+      ) {
+        lastLine = lastLine.slice(0, -1).trimEnd();
+      }
+      lines.push(`${lastLine}${ellipsis}`);
+      remaining = "";
     }
-
-    // Last line: reserve room for ellipsis.
-    const ellipsis = "...";
-    let lastLine = remaining.slice(0, end).trimEnd();
-
-    while (
-      lastLine.length > 0
-      && estimateTextWidth(`${lastLine}${ellipsis}`, fontSize) > maxWidthPx
-    ) {
-      lastLine = lastLine.slice(0, -1).trimEnd();
-    }
-
-    lines.push(lastLine ? `${lastLine}${ellipsis}` : ellipsis);
-    remaining = "";
   }
 
-  if (lines.length === 1) {
-    lines.push("");
-  }
-
-  return lines.slice(0, 2);
+  while (lines.length < 2) lines.push("");
+  return lines;
 };
 
 export async function GET(req: NextRequest) {
@@ -129,7 +126,9 @@ export async function GET(req: NextRequest) {
     .split(",")
     .map((t) => t.trim())
     .filter(Boolean);
-  const titleLines = truncateTitleToTwoLines(title, 108, 1600);
+
+  // Use a slightly smaller max width for calculations to ensure it fits the 1600px container
+  const titleLines = truncateTitleToTwoLines(title, 108, 1450);
 
   // Load Geist fonts
   const geistBold = await fetch(
@@ -158,21 +157,13 @@ export async function GET(req: NextRequest) {
     "og-image",
     "background.png",
   );
-  const usdcPath = path.join(
-    process.cwd(),
-    "public",
-    "assets",
-    "og-image",
-    "usdc.png",
-  );
 
-  const [bgData, usdcData] = await Promise.all([
-    fs.readFile(bgPath),
-    fs.readFile(usdcPath),
-  ]);
-
+  const bgData = await fs.readFile(bgPath);
   const bgBase64 = `data:image/png;base64,${bgData.toString("base64")}`;
-  const usdcBase64 = `data:image/png;base64,${usdcData.toString("base64")}`;
+  
+  // Note: The provided usdc.png is actually a WebP file, which Satori doesn't support.
+  // We use a reliable remote PNG fallback for the USDC icon to ensure it renders correctly.
+  const usdcBase64 = "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png";
 
   return new ImageResponse(
     <div
@@ -223,8 +214,8 @@ export async function GET(req: NextRequest) {
           <div
             style={{
               fontSize: 108,
-              fontFamily: "Geist Bold",
-              fontWeight: 700,
+              fontFamily: "Geist ExtraBold",
+              fontWeight: 800,
               color: "#FFFFFF",
               letterSpacing: "-0.05em",
               lineHeight: 1.1,
@@ -278,39 +269,56 @@ export async function GET(req: NextRequest) {
             gap: 20,
           }}
         >
-          {/* USDC Icon */}
           <div
             style={{
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
-              gap: 20,
             }}
           >
-            <div
-              style={{
-                width: 90,
-                height: 90,
-                backgroundImage: `url(${usdcBase64})`,
-                backgroundSize: "contain",
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "center",
-              }}
-            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {token.toUpperCase() === "USDC" && (
+              <img
+                src={usdcBase64}
+                width="90"
+                height="90"
+                style={{
+                  width: 90,
+                  height: 90,
+                  marginRight: 15,
+                }}
+                alt=""
+              />
+            )}
 
             {/* Amount text */}
             <div
               style={{
                 fontSize: 78,
-                fontFamily: "Geist ExtraBold",
-                fontWeight: 800,
                 color: "#FFFFFF",
                 letterSpacing: "-0.02em",
                 display: "flex",
+                alignItems: "baseline",
               }}
             >
-              <span>{amount}</span>
-              <span style={{ marginLeft: 20 }}>{token}</span>
+              <span
+                style={{
+                  fontFamily: "Geist ExtraBold",
+                  fontWeight: 800,
+                }}
+              >
+                {amount}
+              </span>
+              <span
+                style={{
+                  marginLeft: 15,
+                  fontFamily: "Geist SemiBold",
+                  fontWeight: 600,
+                  opacity: 0.9,
+                }}
+              >
+                {token}
+              </span>
             </div>
           </div>
 

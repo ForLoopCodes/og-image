@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dynamic OG Image Generator for app.gib.work
 
-## Getting Started
+A high-performance dynamic Open Graph (OG) image generator built with Next.js and `@vercel/og` (Satori). Designed specifically for social media previews for `app.gib.work`.
 
-First, run the development server:
+## 📸 Previews
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Demo Interface
+> Interactive UI for real-time parameter testing and URL generation.
+![Demo Screenshot Placeholder](https://via.placeholder.com/1200x600?text=Demo+Interface+Screenshot)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Generated OG Image
+> 1920x1080 dynamic social card with custom text truncation and asset integration.
+![Example Generated Image](https://via.placeholder.com/1200x630?text=Example+OG+Image+Preview)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ✨ Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Dynamic Parameters**: Customize title, tags, amount, token type, and username via URL search params.
+- **Smart Truncation**: Custom server-side logic to wrap text into 2 lines with ellipses (...) since Satori lacks native `line-clamp` support.
+- **Asset Integration**: High-quality background image (PNG) and token icons (WebP/PNG).
+- **Premium Typography**: Uses Geist Sans (Bold, Semi-Bold, Extra-Bold) via CDN.
+- **Real-time Preview**: A dedicated playground at the root route (`/`) to test parameters.
 
-## Learn More
+## 🛠️ Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework**: [Next.js](https://nextjs.org/) (App Router)
+- **Image Engine**: [@vercel/og](https://vercel.com/docs/functions/og-image-generation)
+- **Styling**: Tailwind CSS
+- **Typography**: Geist Sans
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🚀 Getting Started
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Prerequisites
 
-## Deploy on Vercel
+- Node.js 18+ 
+- pnpm / npm / bun
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Installation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Clone the repository:
+   ```bash
+   git clone <repo-url>
+   cd og-image
+   ```
+
+2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+
+3. Run the development server:
+   ```bash
+   pnpm dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000) to access the generator UI.
+
+## 🔗 API Usage
+
+The image generation endpoint is available at `/api/og`. 
+
+### Query Parameters
+
+| Parameter | Default | Description |
+| :--- | :--- | :--- |
+| `title` | "OG Image design..." | The main heading of the card (Max 2 lines) |
+| `tags` | "Design,OG,Gib" | Comma-separated list of tags |
+| `amount` | "150.00" | The bounty/reward amount |
+| `token` | "USDC" | The currency token (displays USDC icon if matched) |
+| `type` | "Unrugable Bounty" | The badge label below the amount |
+| `username` | "@subly1234" | The creator handle |
+
+**Example URL:**
+`/api/og?title=Build+a+decentralized+image+host&tags=Solana,Dev&amount=500&token=USDC`
+
+## 📂 Project Structure
+
+- `src/app/api/og/route.tsx`: Core engine and layout logic.
+- `src/app/page.tsx`: Interactive preview playground.
+- `public/assets/og-image/`: Static background and icon assets.
+

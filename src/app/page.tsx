@@ -31,7 +31,6 @@ export default function Home() {
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Controls */}
           <div className="space-y-4">
             <h2 className="text-xl font-semibold mb-4">Parameters</h2>
 
@@ -129,7 +128,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Preview */}
           <div>
             <h2 className="text-xl font-semibold mb-4">Preview</h2>
             <div className="border border-gray-700 rounded-lg overflow-hidden">
