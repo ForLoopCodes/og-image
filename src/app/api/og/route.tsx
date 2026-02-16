@@ -9,32 +9,54 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
 
   // Dynamic parameters
-  const title = searchParams.get("title") ?? "OG Image design for app.gib.work.";
+  const title =
+    searchParams.get("title") ?? "OG Image design for app.gib.work.";
   const tagsParam = searchParams.get("tags") ?? "Design,OG,Gib";
   const amount = searchParams.get("amount") ?? "150.00";
   const token = searchParams.get("token") ?? "USDC";
   const type = searchParams.get("type") ?? "Unrugable Bounty";
   const username = searchParams.get("username") ?? "@subly1234";
 
-  const tags = tagsParam.split(",").map((t) => t.trim()).filter(Boolean);
+  const tags = tagsParam
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
 
   // Load Geist fonts
   const geistBold = await fetch(
-    new URL("https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-700-normal.woff")
+    new URL(
+      "https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-700-normal.woff",
+    ),
   ).then((res) => res.arrayBuffer());
 
   const geistSemiBold = await fetch(
-    new URL("https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-600-normal.woff")
+    new URL(
+      "https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-600-normal.woff",
+    ),
   ).then((res) => res.arrayBuffer());
 
   const geistExtraBold = await fetch(
-    new URL("https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-800-normal.woff")
+    new URL(
+      "https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-800-normal.woff",
+    ),
   ).then((res) => res.arrayBuffer());
 
   // Load assets
-  const bgPath = path.join(process.cwd(), "public", "assets", "og-image", "background.png");
-  const usdcPath = path.join(process.cwd(), "public", "assets", "og-image", "usdc.png");
-  
+  const bgPath = path.join(
+    process.cwd(),
+    "public",
+    "assets",
+    "og-image",
+    "background.png",
+  );
+  const usdcPath = path.join(
+    process.cwd(),
+    "public",
+    "assets",
+    "og-image",
+    "usdc.png",
+  );
+
   const [bgData, usdcData] = await Promise.all([
     fs.readFile(bgPath),
     fs.readFile(usdcPath),
@@ -44,188 +66,186 @@ export async function GET(req: NextRequest) {
   const usdcBase64 = `data:image/png;base64,${usdcData.toString("base64")}`;
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Background Image with embedded logo */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={bgBase64}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+        }}
+        alt=""
+      />
+
+      {/* Main content overlay */}
       <div
         style={{
+          position: "relative",
           width: "100%",
           height: "100%",
           display: "flex",
-          position: "relative",
-          overflow: "hidden",
+          flexDirection: "column",
+          padding: "80px 100px",
+          justifyContent: "space-between",
         }}
       >
-        {/* Background Image with embedded logo */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={bgBase64}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-          }}
-          alt=""
-        />
-
-        {/* Main content overlay */}
+        {/* Top section: Title + Tags */}
         <div
           style={{
-            position: "relative",
-            width: "100%",
-            height: "100%",
             display: "flex",
             flexDirection: "column",
-            padding: "80px 100px",
-            justifyContent: "space-between",
+            gap: 24,
           }}
         >
-          {/* Top section: Title + Tags */}
+          {/* Title */}
           <div
             style={{
+              fontSize: 108,
+              fontFamily: "Geist Bold",
+              fontWeight: 700,
+              color: "#FFFFFF",
+              letterSpacing: "-0.05em",
+              lineHeight: 1.1,
+              maxWidth: 1600,
+              maxHeight: 108 * 1.1 * 2, // Strict height for 2 lines
+              overflow: "hidden",
               display: "flex",
               flexDirection: "column",
-              gap: 24,
+              // @ts-ignore
+              "line-clamp": 2,
+              // @ts-ignore
+              lineClamp: 2,
             }}
           >
-            {/* Title */}
-            <div
-              style={{
-                fontSize: 108,
-                fontFamily: "Geist Bold",
-                fontWeight: 700,
-                color: "#FFFFFF",
-                letterSpacing: "-0.05em",
-                lineHeight: 1.1,
-                maxWidth: 1600,
-                maxHeight: 108 * 1.1 * 2, // Strict height for 2 lines
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-                // @ts-ignore
-                "line-clamp": 2,
-                // @ts-ignore
-                lineClamp: 2,
-              }}
-            >
-              {title}
-            </div>
-
-            {/* Tags */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                gap: 30,
-              }}
-            >
-              {tags.map((tag) => (
-                <div
-                  key={tag}
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    padding: "6px 30px",
-                    border: "4px solid #FFFFFF",
-                    borderRadius: 9908,
-                    fontSize: 48,
-                    fontFamily: "Geist SemiBold",
-                    fontWeight: 600,
-                    color: "#FFFFFF",
-                    letterSpacing: "-0.02em",
-                  }}
-                >
-                  {tag}
-                </div>
-              ))}
-            </div>
+            {title}
           </div>
 
-          {/* Middle section: Amount + Type */}
+          {/* Tags */}
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              gap: 20,
+              flexDirection: "row",
+              gap: 30,
             }}
           >
-            {/* USDC Icon */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 20,
-              }}
-            >
+            {tags.map((tag) => (
               <div
+                key={tag}
                 style={{
-                  width: 90,
-                  height: 90,
-                  backgroundImage: `url(${usdcBase64})`,
-                  backgroundSize: "contain",
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "center",
-                }}
-              />
-
-              {/* Amount text */}
-              <div
-                style={{
-                  fontSize: 78,
-                  fontFamily: "Geist ExtraBold",
-                  fontWeight: 800,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: "6px 30px",
+                  border: "4px solid #FFFFFF",
+                  borderRadius: 9908,
+                  fontSize: 48,
+                  fontFamily: "Geist SemiBold",
+                  fontWeight: 600,
                   color: "#FFFFFF",
                   letterSpacing: "-0.02em",
-                  display: "flex",
                 }}
               >
-                <span>{amount}</span>
-                <span style={{ marginLeft: 20 }}>{token}</span>
+                {tag}
               </div>
-            </div>
-
-            {/* Type label */}
-            <div
-              style={{
-                fontSize: 48,
-                fontFamily: "Geist SemiBold",
-                fontWeight: 600,
-                color: "#FFFFFF",
-                letterSpacing: "-0.02em",
-                display: "flex",
-              }}
-            >
-              {type}
-            </div>
+            ))}
           </div>
+        </div>
 
-          {/* Bottom section: Username */}
+        {/* Middle section: Amount + Type */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 20,
+          }}
+        >
+          {/* USDC Icon */}
           <div
             style={{
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
+              gap: 20,
             }}
           >
             <div
               style={{
+                width: 90,
+                height: 90,
+                backgroundImage: `url(${usdcBase64})`,
+                backgroundSize: "contain",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+              }}
+            />
+
+            {/* Amount text */}
+            <div
+              style={{
                 fontSize: 78,
-                fontFamily: "Geist SemiBold",
-                fontWeight: 600,
+                fontFamily: "Geist ExtraBold",
+                fontWeight: 800,
                 color: "#FFFFFF",
                 letterSpacing: "-0.02em",
                 display: "flex",
               }}
             >
-              {username}
+              <span>{amount}</span>
+              <span style={{ marginLeft: 20 }}>{token}</span>
             </div>
+          </div>
+
+          {/* Type label */}
+          <div
+            style={{
+              fontSize: 48,
+              fontFamily: "Geist SemiBold",
+              fontWeight: 600,
+              color: "#FFFFFF",
+              letterSpacing: "-0.02em",
+              display: "flex",
+            }}
+          >
+            {type}
+          </div>
+        </div>
+
+        {/* Bottom section: Username */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              fontSize: 78,
+              fontFamily: "Geist SemiBold",
+              fontWeight: 600,
+              color: "#FFFFFF",
+              letterSpacing: "-0.02em",
+              display: "flex",
+            }}
+          >
+            {username}
           </div>
         </div>
       </div>
-    ),
+    </div>,
     {
       width: 1920,
       height: 1080,
@@ -249,6 +269,6 @@ export async function GET(req: NextRequest) {
           style: "normal",
         },
       ],
-    }
+    },
   );
 }
