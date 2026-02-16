@@ -1,10 +1,8 @@
 // Provides a local playground to tweak OG parameters before sharing.
 // Shows live preview output plus ready-to-copy endpoint and meta tags.
 "use client";
-
 import Image from "next/image";
-import { useState } from "react";
-
+import { useState, useMemo } from "react";
 export default function Home() {
   const [title, setTitle] = useState("OG Image design for app.gib.work.");
   const [tags, setTags] = useState("Design,OG,Gib");
@@ -12,16 +10,19 @@ export default function Home() {
   const [token, setToken] = useState("USDC");
   const [type, setType] = useState("Unrugable Bounty");
   const [username, setUsername] = useState("@subly1234");
-
-  const ogUrl = `/api/og?${new URLSearchParams({
-    title,
-    tags,
-    amount,
-    token,
-    type,
-    username,
-  }).toString()}`;
-
+  const currentOgUrl = useMemo(
+    () =>
+      `/api/og?${new URLSearchParams({
+        title,
+        tags,
+        amount,
+        token,
+        type,
+        username,
+      }).toString()}`,
+    [title, tags, amount, token, type, username],
+  );
+  const [previewUrl, setPreviewUrl] = useState(currentOgUrl);
   return (
     <div className="min-h-screen bg-gray-950 p-8 text-white font-(family-name:--font-geist-sans)">
       <div className="max-w-5xl mx-auto">
@@ -30,13 +31,11 @@ export default function Home() {
         </h1>
         <p className="text-gray-400 mb-8">
           Generate dynamic Open Graph images for social media previews.
-          Customize the parameters below and preview in real-time.
+          Customize the parameters below and click generate to preview.
         </p>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="space-y-4">
             <h2 className="text-xl font-semibold mb-4">Parameters</h2>
-
             <div>
               <label className="block text-sm text-gray-400 mb-1">Title</label>
               <input
@@ -46,7 +45,6 @@ export default function Home() {
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
-
             <div>
               <label className="block text-sm text-gray-400 mb-1">
                 Tags (comma-separated)
@@ -58,7 +56,6 @@ export default function Home() {
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm text-gray-400 mb-1">
@@ -83,7 +80,6 @@ export default function Home() {
                 />
               </div>
             </div>
-
             <div>
               <label className="block text-sm text-gray-400 mb-1">
                 Bounty Type
@@ -95,7 +91,6 @@ export default function Home() {
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
-
             <div>
               <label className="block text-sm text-gray-400 mb-1">
                 Username
@@ -107,40 +102,43 @@ export default function Home() {
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
-
+            <button
+              onClick={() => setPreviewUrl(currentOgUrl)}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors cursor-pointer"
+            >
+              Generate Preview
+            </button>
             <div className="pt-4">
               <h3 className="text-sm font-semibold text-gray-400 mb-2">
                 API Endpoint
               </h3>
               <code className="block bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-sm text-purple-300 break-all">
-                {ogUrl}
+                {previewUrl}
               </code>
             </div>
-
             <div className="pt-2">
               <h3 className="text-sm font-semibold text-gray-400 mb-2">
                 HTML Meta Tags
               </h3>
               <pre className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-sm text-green-300 overflow-x-auto">
-                {`<meta property="og:image" content="https://your-domain.vercel.app${ogUrl}" />
+                {`<meta property="og:image" content="https://your-domain.vercel.app${previewUrl}" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="600" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://your-domain.vercel.app${ogUrl}" />`}
+<meta name="twitter:image" content="https://your-domain.vercel.app${previewUrl}" />`}
               </pre>
             </div>
           </div>
-
           <div>
             <h2 className="text-xl font-semibold mb-4">Preview</h2>
             <div className="border border-gray-700 rounded-lg overflow-hidden">
               <Image
-                src={ogUrl}
+                src={previewUrl}
                 alt="OG Image Preview"
                 width={1200}
                 height={600}
                 className="w-full h-auto"
-                key={ogUrl}
+                key={previewUrl}
                 unoptimized
               />
             </div>

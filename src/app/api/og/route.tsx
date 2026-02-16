@@ -4,49 +4,39 @@ import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import fs from "fs/promises";
 import path from "path";
-
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
 const estimateTextWidth = (text: string, fontSize: number) => {
   let units = 0;
-
   for (const ch of text) {
     if (ch === " ") {
       units += 0.35;
       continue;
     }
-
     if (/[.,:;!|]/.test(ch)) {
       units += 0.28;
       continue;
     }
-
     if (/[ilIjtfr]/.test(ch)) {
       units += 0.33;
       continue;
     }
-
     if (/[mwMW@#%&QGO]/.test(ch)) {
       units += 0.85;
       continue;
     }
-
     if (/[A-Z]/.test(ch)) {
       units += 0.75;
       continue;
     }
-
     if (/[0-9]/.test(ch)) {
       units += 0.62;
       continue;
     }
-
     units += 0.65;
   }
   return units * fontSize * 1.1;
 };
-
 const truncateTitleToTwoLines = (
   rawTitle: string,
   fontSize: number,
@@ -54,21 +44,16 @@ const truncateTitleToTwoLines = (
 ) => {
   const title = rawTitle.replace(/\s+/g, " ").trim();
   if (!title) return ["", ""];
-
   const lines: string[] = [];
   let remaining = title;
-
   for (let lineIndex = 0; lineIndex < 2; lineIndex += 1) {
     if (!remaining) break;
-
     const isLastLine = lineIndex === 1;
-
     if (estimateTextWidth(remaining, fontSize) <= maxWidthPx) {
       lines.push(remaining);
       remaining = "";
       break;
     }
-
     let end = remaining.length;
     while (
       end > 0 &&
@@ -76,24 +61,20 @@ const truncateTitleToTwoLines = (
     ) {
       end -= 1;
     }
-
     if (end <= 0) {
       lines.push(isLastLine ? "..." : "");
       remaining = "";
       break;
     }
-
     if (!isLastLine) {
       const slice = remaining.slice(0, end);
       const lastSpace = slice.lastIndexOf(" ");
       const cutAt = lastSpace > 0 ? lastSpace : end;
-
       lines.push(remaining.slice(0, cutAt).trimEnd());
       remaining = remaining.slice(cutAt).trimStart();
     } else {
       let lastLine = remaining.slice(0, end).trimEnd();
       const ellipsis = "...";
-
       while (
         lastLine.length > 0 &&
         estimateTextWidth(`${lastLine}${ellipsis}`, fontSize) > maxWidthPx
@@ -104,22 +85,23 @@ const truncateTitleToTwoLines = (
       remaining = "";
     }
   }
-
   while (lines.length < 2) lines.push("");
   return lines;
 };
-
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const title = searchParams.get("title") ?? "OG Image design for app.gib.work.";
+  const title =
+    searchParams.get("title") ?? "OG Image design for app.gib.work.";
   const tagsParam = searchParams.get("tags") ?? "Design,OG,Gib";
   const amount = searchParams.get("amount") ?? "150.00";
   const token = searchParams.get("token") ?? "USDC";
   const type = searchParams.get("type") ?? "Unrugable Bounty";
   const username = searchParams.get("username") ?? "@subly1234";
-  const tags = tagsParam.split(",").map((t) => t.trim()).filter(Boolean);
+  const tags = tagsParam
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
   const titleLines = truncateTitleToTwoLines(title, 62, 960);
-
   const bgPath = path.join(
     process.cwd(),
     "public",
@@ -127,7 +109,6 @@ export async function GET(req: NextRequest) {
     "og-image",
     "background.png",
   );
-
   const [geistBold, geistSemiBold, geistExtraBold, bgData] = await Promise.all([
     fetch(
       new URL(
@@ -146,12 +127,10 @@ export async function GET(req: NextRequest) {
     ).then((res) => res.arrayBuffer()),
     fs.readFile(bgPath),
   ]);
-
   const bgBase64 = `data:image/png;base64,${bgData.toString("base64")}`;
   const normalizedToken = token.trim().toUpperCase();
   const usdcIconUrl =
     "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png";
-
   return new ImageResponse(
     <div
       style={{
@@ -174,7 +153,6 @@ export async function GET(req: NextRequest) {
         }}
         alt=""
       />
-
       <div
         style={{
           position: "relative",
@@ -201,7 +179,7 @@ export async function GET(req: NextRequest) {
               color: "#FFFFFF",
               letterSpacing: "-0.05em",
               lineHeight: 1.1,
-              maxWidth: 1000,
+              maxWidth: 1400,
               display: "flex",
               flexDirection: "column",
               maxHeight: 62 * 1.1 * 2,
@@ -211,7 +189,6 @@ export async function GET(req: NextRequest) {
             <span style={{ display: "flex" }}>{titleLines[0]}</span>
             <span style={{ display: "flex" }}>{titleLines[1]}</span>
           </div>
-
           <div
             style={{
               display: "flex",
@@ -241,7 +218,6 @@ export async function GET(req: NextRequest) {
             ))}
           </div>
         </div>
-
         <div
           style={{
             display: "flex",
@@ -269,7 +245,6 @@ export async function GET(req: NextRequest) {
                 alt=""
               />
             )}
-
             <div
               style={{
                 fontSize: 44,
@@ -299,7 +274,6 @@ export async function GET(req: NextRequest) {
               </span>
             </div>
           </div>
-
           <div
             style={{
               fontSize: 28,
@@ -313,7 +287,6 @@ export async function GET(req: NextRequest) {
             {type}
           </div>
         </div>
-
         <div
           style={{
             display: "flex",

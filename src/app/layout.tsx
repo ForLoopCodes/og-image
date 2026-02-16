@@ -1,3 +1,5 @@
+// Configures global layout, fonts, and base metadata for sharing.
+// Resolves environment-specific URLs for social media preview reliability.
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -45,7 +47,6 @@ export const metadata: Metadata = {
     images: ["/api/og"],
   },
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
