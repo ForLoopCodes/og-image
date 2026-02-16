@@ -1,5 +1,8 @@
+// Provides a local playground to tweak OG parameters before sharing.
+// Shows live preview output plus ready-to-copy endpoint and meta tags.
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 
 export default function Home() {
@@ -20,7 +23,7 @@ export default function Home() {
   }).toString()}`;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-8 font-[family-name:var(--font-geist-sans)]">
+    <div className="min-h-screen bg-gray-950 p-8 text-white font-(family-name:--font-geist-sans)">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-4xl font-bold mb-2">
           app.gib.work OG Image Generator
@@ -131,12 +134,14 @@ export default function Home() {
           <div>
             <h2 className="text-xl font-semibold mb-4">Preview</h2>
             <div className="border border-gray-700 rounded-lg overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={ogUrl}
                 alt="OG Image Preview"
-                className="w-full"
+                width={1200}
+                height={630}
+                className="w-full h-auto"
                 key={ogUrl}
+                unoptimized
               />
             </div>
             <p className="text-sm text-gray-500 mt-2">

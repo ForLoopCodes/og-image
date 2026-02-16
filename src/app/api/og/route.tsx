@@ -1,3 +1,5 @@
+// Builds dynamic OG images for app.gib.work shares with branded layout.
+// Loads fonts and assets, truncates titles, then renders bounty metadata.
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import fs from "fs/promises";
@@ -41,8 +43,6 @@ const estimateTextWidth = (text: string, fontSize: number) => {
 
     units += 0.65;
   }
-
-  // Slightly increase estimate to be safer.
   return units * fontSize * 1.1;
 };
 
@@ -62,16 +62,17 @@ const truncateTitleToTwoLines = (
 
     const isLastLine = lineIndex === 1;
 
-    // If it fits entirely in the remaining space of the line
     if (estimateTextWidth(remaining, fontSize) <= maxWidthPx) {
       lines.push(remaining);
       remaining = "";
       break;
     }
 
-    // Find the maximum prefix that fits.
     let end = remaining.length;
-    while (end > 0 && estimateTextWidth(remaining.slice(0, end), fontSize) > maxWidthPx) {
+    while (
+      end > 0 &&
+      estimateTextWidth(remaining.slice(0, end), fontSize) > maxWidthPx
+    ) {
       end -= 1;
     }
 
@@ -84,19 +85,16 @@ const truncateTitleToTwoLines = (
     if (!isLastLine) {
       const slice = remaining.slice(0, end);
       const lastSpace = slice.lastIndexOf(" ");
-      // Try to break at a space. If no space, just break at the width limit.
       const cutAt = lastSpace > 0 ? lastSpace : end;
 
       lines.push(remaining.slice(0, cutAt).trimEnd());
       remaining = remaining.slice(cutAt).trimStart();
     } else {
-      // Last line: append ellipsis.
       let lastLine = remaining.slice(0, end).trimEnd();
       const ellipsis = "...";
-      
-      // Backtrack until text + ellipsis fits
+
       while (
-        lastLine.length > 0 && 
+        lastLine.length > 0 &&
         estimateTextWidth(`${lastLine}${ellipsis}`, fontSize) > maxWidthPx
       ) {
         lastLine = lastLine.slice(0, -1).trimEnd();
@@ -113,7 +111,6 @@ const truncateTitleToTwoLines = (
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
 
-  // Dynamic parameters
   const title =
     searchParams.get("title") ?? "OG Image design for app.gib.work.";
   const tagsParam = searchParams.get("tags") ?? "Design,OG,Gib";
@@ -127,29 +124,8 @@ export async function GET(req: NextRequest) {
     .map((t) => t.trim())
     .filter(Boolean);
 
-  // Use a slightly smaller max width for calculations to ensure it fits the 1600px container
   const titleLines = truncateTitleToTwoLines(title, 108, 1450);
 
-  // Load Geist fonts
-  const geistBold = await fetch(
-    new URL(
-      "https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-700-normal.woff",
-    ),
-  ).then((res) => res.arrayBuffer());
-
-  const geistSemiBold = await fetch(
-    new URL(
-      "https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-600-normal.woff",
-    ),
-  ).then((res) => res.arrayBuffer());
-
-  const geistExtraBold = await fetch(
-    new URL(
-      "https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-800-normal.woff",
-    ),
-  ).then((res) => res.arrayBuffer());
-
-  // Load assets
   const bgPath = path.join(
     process.cwd(),
     "public",
@@ -158,12 +134,29 @@ export async function GET(req: NextRequest) {
     "background.png",
   );
 
-  const bgData = await fs.readFile(bgPath);
+  const [geistBold, geistSemiBold, geistExtraBold, bgData] = await Promise.all([
+    fetch(
+      new URL(
+        "https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-700-normal.woff",
+      ),
+    ).then((res) => res.arrayBuffer()),
+    fetch(
+      new URL(
+        "https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-600-normal.woff",
+      ),
+    ).then((res) => res.arrayBuffer()),
+    fetch(
+      new URL(
+        "https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-800-normal.woff",
+      ),
+    ).then((res) => res.arrayBuffer()),
+    fs.readFile(bgPath),
+  ]);
+
   const bgBase64 = `data:image/png;base64,${bgData.toString("base64")}`;
-  
-  // Note: The provided usdc.png is actually a WebP file, which Satori doesn't support.
-  // We use a reliable remote PNG fallback for the USDC icon to ensure it renders correctly.
-  const usdcBase64 = "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png";
+
+  const usdcIconUrl =
+    "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png";
 
   return new ImageResponse(
     <div
@@ -175,8 +168,6 @@ export async function GET(req: NextRequest) {
         overflow: "hidden",
       }}
     >
-      {/* Background Image with embedded logo */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={bgBase64}
         style={{
@@ -190,7 +181,6 @@ export async function GET(req: NextRequest) {
         alt=""
       />
 
-      {/* Main content overlay */}
       <div
         style={{
           position: "relative",
@@ -202,7 +192,6 @@ export async function GET(req: NextRequest) {
           justifyContent: "space-between",
         }}
       >
-        {/* Top section: Title + Tags */}
         <div
           style={{
             display: "flex",
@@ -210,7 +199,6 @@ export async function GET(req: NextRequest) {
             gap: 24,
           }}
         >
-          {/* Title */}
           <div
             style={{
               fontSize: 108,
@@ -230,7 +218,6 @@ export async function GET(req: NextRequest) {
             <span style={{ display: "flex" }}>{titleLines[1]}</span>
           </div>
 
-          {/* Tags */}
           <div
             style={{
               display: "flex",
@@ -261,7 +248,6 @@ export async function GET(req: NextRequest) {
           </div>
         </div>
 
-        {/* Middle section: Amount + Type */}
         <div
           style={{
             display: "flex",
@@ -276,10 +262,9 @@ export async function GET(req: NextRequest) {
               alignItems: "center",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             {token.toUpperCase() === "USDC" && (
               <img
-                src={usdcBase64}
+                src={usdcIconUrl}
                 width="90"
                 height="90"
                 style={{
@@ -291,7 +276,6 @@ export async function GET(req: NextRequest) {
               />
             )}
 
-            {/* Amount text */}
             <div
               style={{
                 fontSize: 78,
@@ -322,7 +306,6 @@ export async function GET(req: NextRequest) {
             </div>
           </div>
 
-          {/* Type label */}
           <div
             style={{
               fontSize: 48,
@@ -337,7 +320,6 @@ export async function GET(req: NextRequest) {
           </div>
         </div>
 
-        {/* Bottom section: Username */}
         <div
           style={{
             display: "flex",
