@@ -6,6 +6,7 @@ import fs from "fs/promises";
 import path from "path";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const estimateTextWidth = (text: string, fontSize: number) => {
   let units = 0;
@@ -110,20 +111,13 @@ const truncateTitleToTwoLines = (
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-
-  const title =
-    searchParams.get("title") ?? "OG Image design for app.gib.work.";
+  const title = searchParams.get("title") ?? "OG Image design for app.gib.work.";
   const tagsParam = searchParams.get("tags") ?? "Design,OG,Gib";
   const amount = searchParams.get("amount") ?? "150.00";
   const token = searchParams.get("token") ?? "USDC";
   const type = searchParams.get("type") ?? "Unrugable Bounty";
   const username = searchParams.get("username") ?? "@subly1234";
-
-  const tags = tagsParam
-    .split(",")
-    .map((t) => t.trim())
-    .filter(Boolean);
-
+  const tags = tagsParam.split(",").map((t) => t.trim()).filter(Boolean);
   const titleLines = truncateTitleToTwoLines(title, 108, 1450);
 
   const bgPath = path.join(
@@ -154,7 +148,7 @@ export async function GET(req: NextRequest) {
   ]);
 
   const bgBase64 = `data:image/png;base64,${bgData.toString("base64")}`;
-
+  const normalizedToken = token.trim().toUpperCase();
   const usdcIconUrl =
     "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png";
 
@@ -262,7 +256,7 @@ export async function GET(req: NextRequest) {
               alignItems: "center",
             }}
           >
-            {token.toUpperCase() === "USDC" && (
+            {normalizedToken === "USDC" && (
               <img
                 src={usdcIconUrl}
                 width="90"
