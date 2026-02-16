@@ -118,7 +118,7 @@ export async function GET(req: NextRequest) {
   const type = searchParams.get("type") ?? "Unrugable Bounty";
   const username = searchParams.get("username") ?? "@subly1234";
   const tags = tagsParam.split(",").map((t) => t.trim()).filter(Boolean);
-  const titleLines = truncateTitleToTwoLines(title, 108, 1450);
+  const titleLines = truncateTitleToTwoLines(title, 62, 960);
 
   const bgPath = path.join(
     process.cwd(),
@@ -182,7 +182,7 @@ export async function GET(req: NextRequest) {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          padding: "80px 100px",
+          padding: "46px 56px",
           justifyContent: "space-between",
         }}
       >
@@ -190,21 +190,21 @@ export async function GET(req: NextRequest) {
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: 24,
+            gap: 14,
           }}
         >
           <div
             style={{
-              fontSize: 108,
+              fontSize: 62,
               fontFamily: "Geist ExtraBold",
               fontWeight: 800,
               color: "#FFFFFF",
               letterSpacing: "-0.05em",
               lineHeight: 1.1,
-              maxWidth: 1600,
+              maxWidth: 1000,
               display: "flex",
               flexDirection: "column",
-              maxHeight: 108 * 1.1 * 2,
+              maxHeight: 62 * 1.1 * 2,
               overflow: "hidden",
             }}
           >
@@ -216,7 +216,7 @@ export async function GET(req: NextRequest) {
             style={{
               display: "flex",
               flexDirection: "row",
-              gap: 30,
+              gap: 18,
             }}
           >
             {tags.map((tag) => (
@@ -226,10 +226,10 @@ export async function GET(req: NextRequest) {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  padding: "6px 30px",
-                  border: "4px solid #FFFFFF",
+                  padding: "4px 18px",
+                  border: "2px solid #FFFFFF",
                   borderRadius: 9908,
-                  fontSize: 48,
+                  fontSize: 28,
                   fontFamily: "Geist SemiBold",
                   fontWeight: 600,
                   color: "#FFFFFF",
@@ -246,7 +246,7 @@ export async function GET(req: NextRequest) {
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: 20,
+            gap: 12,
           }}
         >
           <div
@@ -262,9 +262,9 @@ export async function GET(req: NextRequest) {
                 width="90"
                 height="90"
                 style={{
-                  width: 90,
-                  height: 90,
-                  marginRight: 15,
+                  width: 52,
+                  height: 52,
+                  marginRight: 10,
                 }}
                 alt=""
               />
@@ -272,7 +272,7 @@ export async function GET(req: NextRequest) {
 
             <div
               style={{
-                fontSize: 78,
+                fontSize: 44,
                 color: "#FFFFFF",
                 letterSpacing: "-0.02em",
                 display: "flex",
@@ -289,7 +289,7 @@ export async function GET(req: NextRequest) {
               </span>
               <span
                 style={{
-                  marginLeft: 15,
+                  marginLeft: 10,
                   fontFamily: "Geist SemiBold",
                   fontWeight: 600,
                   opacity: 0.9,
@@ -302,7 +302,7 @@ export async function GET(req: NextRequest) {
 
           <div
             style={{
-              fontSize: 48,
+              fontSize: 28,
               fontFamily: "Geist SemiBold",
               fontWeight: 600,
               color: "#FFFFFF",
@@ -323,12 +323,13 @@ export async function GET(req: NextRequest) {
         >
           <div
             style={{
-              fontSize: 78,
+              fontSize: 44,
               fontFamily: "Geist SemiBold",
               fontWeight: 600,
               color: "#FFFFFF",
               letterSpacing: "-0.02em",
               display: "flex",
+              marginBottom: 14,
             }}
           >
             {username}
@@ -337,8 +338,8 @@ export async function GET(req: NextRequest) {
       </div>
     </div>,
     {
-      width: 1920,
-      height: 1080,
+      width: 1200,
+      height: 600,
       fonts: [
         {
           name: "Geist Bold",

@@ -123,8 +123,8 @@ export default function Home() {
               </h3>
               <pre className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-sm text-green-300 overflow-x-auto">
                 {`<meta property="og:image" content="https://your-domain.vercel.app${ogUrl}" />
-<meta property="og:image:width" content="1920" />
-<meta property="og:image:height" content="1080" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="600" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="https://your-domain.vercel.app${ogUrl}" />`}
               </pre>
@@ -138,14 +138,14 @@ export default function Home() {
                 src={ogUrl}
                 alt="OG Image Preview"
                 width={1200}
-                height={630}
+                height={600}
                 className="w-full h-auto"
                 key={ogUrl}
                 unoptimized
               />
             </div>
             <p className="text-sm text-gray-500 mt-2">
-              1200 &times; 630px &bull; PNG
+              1200 &times; 600px &bull; PNG
             </p>
           </div>
         </div>

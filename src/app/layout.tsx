@@ -32,8 +32,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/api/og",
-        width: 1920,
-        height: 1080,
+        width: 1200,
+        height: 600,
         alt: "app.gib.work bounty preview",
       },
     ],
