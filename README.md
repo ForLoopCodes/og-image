@@ -4,13 +4,9 @@ OG image generator for `app.gib.work`.
 
 ## Demo screenshot
 
-Replace this image with your local UI screenshot.
-
 <img width="1867" height="962" alt="image" src="https://github.com/user-attachments/assets/a199b69f-4e3e-4baf-8a09-39a65a2e17b7" />
 
 ## OG image example
-
-Replace this image with a generated OG output.
 
 <img width="1920" height="1080" alt="og" src="https://github.com/user-attachments/assets/dd0125ec-b558-457d-840f-e57409071a41" />
 
