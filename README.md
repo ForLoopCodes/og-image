@@ -2,17 +2,19 @@
 
 A high-performance dynamic Open Graph (OG) image generator built with Next.js and `@vercel/og` (Satori). Designed specifically for social media previews for `app.gib.work`.
 
-## 📸 Previews
+## Previews
 
 ### Demo Interface
 > Interactive UI for real-time parameter testing and URL generation.
-![Demo Screenshot Placeholder](https://via.placeholder.com/1200x600?text=Demo+Interface+Screenshot)
+<img width="1867" height="962" alt="image" src="https://github.com/user-attachments/assets/a9d43c38-94e7-4d11-8a90-387728d4160b" />
+
 
 ### Generated OG Image
-> 1920x1080 dynamic social card with custom text truncation and asset integration.
-![Example Generated Image](https://via.placeholder.com/1200x630?text=Example+OG+Image+Preview)
+> dynamic social card with custom text truncation and asset integration.
+<img width="1920" height="1080" alt="og" src="https://github.com/user-attachments/assets/df3cb807-62c2-443d-b55a-e1f4b1e904ff" />
 
-## ✨ Features
+
+## Features
 
 - **Dynamic Parameters**: Customize title, tags, amount, token type, and username via URL search params.
 - **Smart Truncation**: Custom server-side logic to wrap text into 2 lines with ellipses (...) since Satori lacks native `line-clamp` support.
@@ -27,7 +29,7 @@ A high-performance dynamic Open Graph (OG) image generator built with Next.js an
 - **Styling**: Tailwind CSS
 - **Typography**: Geist Sans
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -54,7 +56,7 @@ A high-performance dynamic Open Graph (OG) image generator built with Next.js an
 
 4. Open [http://localhost:3000](http://localhost:3000) to access the generator UI.
 
-## 🔗 API Usage
+## API Usage
 
 The image generation endpoint is available at `/api/og`. 
 
@@ -72,7 +74,7 @@ The image generation endpoint is available at `/api/og`.
 **Example URL:**
 `/api/og?title=Build+a+decentralized+image+host&tags=Solana,Dev&amount=500&token=USDC`
 
-## 📂 Project Structure
+## Project Structure
 
 - `src/app/api/og/route.tsx`: Core engine and layout logic.
 - `src/app/page.tsx`: Interactive preview playground.
